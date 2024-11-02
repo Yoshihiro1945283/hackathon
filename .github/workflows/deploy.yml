@@ -60,21 +60,21 @@ jobs:
       - name: Install Cloudflare CLI
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget gnupg
+          sudo apt-get install -y wget
           wget -q https://pkg.cloudflare.com/cloudflare-main.gpg
           sudo install -o root -g root -m 644 cloudflare-main.gpg /usr/share/keyrings/
           echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
           sudo apt-get update
-          sudo apt-get install -y cloudflared || { echo "Cloudflare package not found"; exit 1; }
-          cloudflared -v || { echo "Cloudflare CLI installation failed"; exit 1; }
+          sudo apt-get install -y cloudflared
+          sudo cloudflared service install # Install cloudflared service
 
       - name: Authenticate with Cloudflare Tunnel
         env:
           CF_CLIENT_ID: ${{ secrets.CF_CLIENT_ID }}
           CF_CLIENT_SECRET: ${{ secrets.CF_CLIENT_SECRET }}
         run: |
-          echo "$CF_CLIENT_ID:$CF_CLIENT_SECRET" | cloudflared login --service-token || { echo "Cloudflare login failed"; exit 1; }
-          cloudflared tunnel route ip add 192.168.7.1 || { echo "Failed to add tunnel route"; exit 1; }
+          echo "$CF_CLIENT_ID:$CF_CLIENT_SECRET" | cloudflared login --service-token
+          cloudflared tunnel route ip add 192.168.7.1
 
       - name: Setup SSH
         env:
