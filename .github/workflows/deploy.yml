@@ -18,9 +18,10 @@ jobs:
           sudo apt-get install -y wget gnupg
           curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflare.list
-          sudo apt-get update
+          sudo apt-get update  # Refresh package list after adding Cloudflare repo
+          sudo apt-cache policy cloudflared  # Check if the package is available
           sudo apt-get install -y cloudflared
-          cloudflared -v # Confirm installation
+          cloudflared -v  # Confirm installation
 
       - name: Authenticate with Cloudflare Tunnel
         env:
