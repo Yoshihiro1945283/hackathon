@@ -1,3 +1,48 @@
+# name: Deploy to Server via Cloudflare Tunnel
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Install Cloudflare CLI
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y wget
+#           wget -q https://pkg.cloudflare.com/cloudflare-main.gpg
+#           sudo install -o root -g root -m 644 cloudflare-main.gpg /usr/share/keyrings/
+#           echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+#           sudo apt-get update
+#           sudo apt-get install -y cloudflared || echo "Cloudflare package not found"
+
+#       - name: Authenticate with Cloudflare Tunnel
+#         env:
+#           CF_CLIENT_ID: ${{ secrets.CF_CLIENT_ID }}
+#           CF_CLIENT_SECRET: ${{ secrets.CF_CLIENT_SECRET }}
+#         run: |
+#           echo "$CF_CLIENT_ID:$CF_CLIENT_SECRET" | cloudflared login --service-token
+#           cloudflared tunnel route ip add 192.168.7.1
+
+#       - name: Setup SSH
+#         env:
+#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#         run: |
+#           mkdir -p ~/.ssh
+#           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+#           chmod 600 ~/.ssh/id_rsa
+#           ssh-keyscan -H serverbuilding.com >> ~/.ssh/known_hosts
+
+#       - name: Deploy code via SSH
+#         run: |
+#           ssh yoshihiro@serverbuilding.com 'cd /var/www/html && git pull origin main'
+
 name: Deploy to Server via Cloudflare Tunnel
 
 on:
@@ -15,20 +60,21 @@ jobs:
       - name: Install Cloudflare CLI
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
+          sudo apt-get install -y wget gnupg
           wget -q https://pkg.cloudflare.com/cloudflare-main.gpg
           sudo install -o root -g root -m 644 cloudflare-main.gpg /usr/share/keyrings/
           echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
           sudo apt-get update
-          sudo apt-get install -y cloudflared || echo "Cloudflare package not found"
+          sudo apt-get install -y cloudflared || { echo "Cloudflare package not found"; exit 1; }
+          cloudflared -v || { echo "Cloudflare CLI installation failed"; exit 1; }
 
       - name: Authenticate with Cloudflare Tunnel
         env:
           CF_CLIENT_ID: ${{ secrets.CF_CLIENT_ID }}
           CF_CLIENT_SECRET: ${{ secrets.CF_CLIENT_SECRET }}
         run: |
-          echo "$CF_CLIENT_ID:$CF_CLIENT_SECRET" | cloudflared login --service-token
-          cloudflared tunnel route ip add 192.168.7.1
+          echo "$CF_CLIENT_ID:$CF_CLIENT_SECRET" | cloudflared login --service-token || { echo "Cloudflare login failed"; exit 1; }
+          cloudflared tunnel route ip add 192.168.7.1 || { echo "Failed to add tunnel route"; exit 1; }
 
       - name: Setup SSH
         env:
