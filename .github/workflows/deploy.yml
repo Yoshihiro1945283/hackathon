@@ -15,13 +15,12 @@ jobs:
       - name: Install Cloudflare CLI
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
-          wget -q https://pkg.cloudflare.com/cloudflare-main.gpg
-          sudo install -o root -g root -m 644 cloudflare-main.gpg /usr/share/keyrings/
-          echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt-get install -y wget gnupg
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflare.list
           sudo apt-get update
           sudo apt-get install -y cloudflared
-          cloudflared -v # インストール確認
+          cloudflared -v # Confirm installation
 
       - name: Authenticate with Cloudflare Tunnel
         env:
