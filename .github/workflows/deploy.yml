@@ -59,14 +59,18 @@ jobs:
 
       - name: Install Cloudflare CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget -q https://pkg.cloudflare.com/cloudflare-main.gpg
-          sudo install -o root -g root -m 644 cloudflare-main.gpg /usr/share/keyrings/
-          echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
-          sudo apt-get update
-          sudo apt-get install -y cloudflared
-          sudo cloudflared service install # Install cloudflared service
+          # sudo apt-get update
+          # sudo apt-get install -y wget
+          # wget -q https://pkg.cloudflare.com/cloudflare-main.gpg
+          # sudo install -o root -g root -m 644 cloudflare-main.gpg /usr/share/keyrings/
+          # echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          # sudo apt-get update
+          # sudo apt-get install -y cloudflared
+          # sudo cloudflared service install # Install cloudflared service
+          curl -L https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-archive-keyring.gpg >/dev/null
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-archive-keyring.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee  /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update
+          sudo apt install cloudflared
 
       - name: Authenticate with Cloudflare Tunnel
         env:
