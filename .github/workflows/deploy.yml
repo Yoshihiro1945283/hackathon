@@ -26,7 +26,7 @@ jobs:
         run: |
           cloudflared tunnel login
           # If you need to route a specific IP, replace '192.168.7.1' with your desired CIDR range and your tunnel ID
-          cloudflared tunnel route ip add 192.168.7.1/24 9bb77500-caf3-40c2-b89c-2a03ff76df2e
+          # cloudflared tunnel route ip add 192.168.7.1/24 9bb77500-caf3-40c2-b89c-2a03ff76df2e
 
       - name: Setup SSH
         env:
