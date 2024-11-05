@@ -73,7 +73,7 @@ jobs:
         run: |
           cloudflared tunnel login
           # 必要に応じて、特定のIPをルート設定
-          cloudflared tunnel route ip add 192.168.7.1/24 dc466ce6-cfd3-4d00-a45c-94e43ca499aa
+          # cloudflared tunnel route ip add 192.168.7.1/24 dc466ce6-cfd3-4d00-a45c-94e43ca499aa
 
       - name: Setup SSH
         env:
