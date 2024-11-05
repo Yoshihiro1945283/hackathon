@@ -82,8 +82,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H serverbuilding.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H ssh.serverbuilding.com >> ~/.ssh/known_hosts
 
       - name: Deploy code via SSH
         run: |
-          ssh yoshihiro@serverbuilding.com 'cd /var/www/html && git pull origin main'
+          ssh yoshihiro@ssh.serverbuilding.com 'cd /var/www/html && git pull origin main'
